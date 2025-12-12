@@ -69,10 +69,6 @@ displayFullLangName = false
   name = "googlescholar"
   url = "https://scholar.google.co.in/citations?user=btYSrEcAAAAJ&hl"
 
-  [[params.socialIcons]]
-  name = "cv"
-  url = "/resume/Resume.pdf"
-
 [menu]
   [[menu.main]]
   identifier = "about"
