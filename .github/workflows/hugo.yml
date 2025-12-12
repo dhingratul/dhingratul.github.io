@@ -4,7 +4,9 @@ name: Deploy Hugo site to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
+    branches:
+      - main
+      - master
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -31,7 +33,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.146.0
+      HUGO_VERSION: 0.128.0
     steps:
       - name: Install Hugo CLI
         run: |
@@ -43,32 +45,22 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 0
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
       - name: Install Node.js dependencies
         run: "[[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true"
-      - name: Pre-build maintenance check
-        run: |
-          # Quick CSS health check before building
-          CSS_LINES=$(wc -l < assets/css/extended/custom.css)
-          echo "📊 CSS lines: $CSS_LINES"
-          if [[ $CSS_LINES -gt 1500 ]]; then
-            echo "⚠️ CSS file is quite large ($CSS_LINES lines) - consider optimization"
-          fi
-
       - name: Build with Hugo
         env:
           HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
           HUGO_ENVIRONMENT: production
+          TZ: America/Los_Angeles
         run: |
           hugo \
+            --gc \
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"
-          
-          # Post-build size check
-          BUILD_SIZE=$(du -sh public | cut -f1)
-          echo "📦 Build size: $BUILD_SIZE"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
